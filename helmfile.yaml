@@ -1,11 +1,22 @@
+repositories:
+  - name: argo
+    url: https://argoproj.github.io/argo-helm
+
 releases:
+  - name: argocd
+    namespace: argocd
+    chart: argo/argo-cd
+    version: 7.x.x
+    values:
+      - ./values/argocd/values.yaml
+
   - name: rediscart
     chart: charts/redis
-    values: 
+    values:
       - values/redis-values.yaml
       - appReplicas: "1"
       - volumeName: "redis-cart-data"
-  
+
   - name: emailservice
     chart: charts/microservice
     values:
@@ -14,12 +25,12 @@ releases:
   - name: cartservice
     chart: charts/microservice
     values:
-      - values/cart-service-values.yaml    
+      - values/cart-service-values.yaml
 
   - name: currencyservice
     chart: charts/microservice
     values:
-      - values/currency-service-values.yaml   
+      - values/currency-service-values.yaml
 
   - name: paymentservice
     chart: charts/microservice

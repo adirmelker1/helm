@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: argocd-repo-server
+  namespace: argocd
+spec:
+  template:
+    spec:
+      initContainers:
+        - name: download-helmfile
+          image: ghcr.io/helmfile/helmfile:v0.159.0
+          command: [sh, -c]
+          args:
+            [
+              "cp $(which helmfile) /custom-tools/helmfile && chmod +x /custom-tools/helmfile",
+            ]
+          volumeMounts:
+            - name: custom-tools
+              mountPath: /custom-tools
+      containers:
+        - name: helmfile-plugin
+          image: quay.io/argoproj/argocd:v3.3.8
+          command: [/var/run/argocd/argocd-cmp-server]
+          securityContext:
+            runAsUser: 999
+          env:
+            - name: PATH
+              value: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/custom-tools
+          volumeMounts:
+            - mountPath: /var/run/argocd
+              name: var-files
+            - mountPath: /home/argocd/cmp-server/config
+              name: argocd-cmp-cm
+            - mountPath: /home/argocd/cmp-server/plugins # זה החלק הקריטי!
+              name: plugins
+            - mountPath: /custom-tools
+              name: custom-tools
+            - mountPath: /tmp
+              name: tmp
+      volumes:
+        - name: custom-tools
+          emptyDir: {}
+        - name: argocd-cmp-cm
+          configMap:
+            name: argocd-cmp-cm
+        # ה-Volume שנקרא plugins כבר מוגדר ב-Deployment המקורי, אז אין צורך להוסיף אותו כאן שוב

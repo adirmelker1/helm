@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-cmp-cm
+  namespace: argocd
+data:
+  plugin.yaml: |
+    apiVersion: argoproj.io/v1alpha1
+    kind: ConfigManagementPlugin
+    metadata:
+      name: helmfile
+    spec:
+      discover:
+        fileName: "helmfile.yaml"
+      generate:
+        command: ["sh", "-c"]
+        args: ["helmfile -n ${ARGOCD_APP_NAMESPACE} template"]
