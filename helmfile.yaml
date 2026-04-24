@@ -3,13 +3,6 @@ repositories:
     url: https://argoproj.github.io/argo-helm
 
 releases:
-  - name: argocd
-    namespace: argocd
-    chart: argo/argo-cd
-    version: 7.x.x
-    values:
-      - ./values/argocd/values.yaml
-
   - name: rediscart
     chart: charts/redis
     values:
